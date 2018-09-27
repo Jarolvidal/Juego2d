@@ -1,0 +1,89 @@
+<!-- Documento html orientado a presentar un ejemplo utilizando CANVAS -->
+
+<!-- Etiqueta principal en html -->
+<html>
+
+<!-- Encabezado -->
+<head>
+
+	<!-- Título que aparece en la barra del navegador -->
+	<title>Probando canvas</title>
+
+	<!-- Inicio de codificación del programa -->
+	<script>
+
+		// Esta función se ejecuta cuando se carga la página (onload)
+		window.onload = function() {
+
+			// Recibimos el elemento canvas. Es una referencia dentro de JavaScript del canvas en html
+			var elemento = document.getElementById('micanvas');
+
+			// Comprobación sobre si encontramos el elemento canvas,
+			// y podemos extraer su contexto con getContext(), que indica compatibilidad con canvas
+			// Si ambas condiciones se cumplen (operador && - and), se ingresa dentro de las llaves {}
+
+			if (elemento && elemento.getContext) {
+				// Accedo al contexto de '2d' de este canvas, necesario para dibujar
+				// Con la variable 'contexto' podemos manipular el canvas a voluntad
+				var contexto = elemento.getContext('2d');
+				var c = document.getElementById("myCanvas");
+				var ctx = c.getContext("2d");
+				var c = document.getElementById("my1Canvas");
+				var ctx = c.getContext("2d");
+			
+			
+				// Si la variable 'contexto' existe, significa que la asignación tuvo éxito,
+				// y se puede utilizar dicha variable para dibujar (o todo lo que corresponda)
+
+				if (contexto) {
+
+					// Si tengo el contexto 2d es que todo ha ido bien y puedo empezar a dibujar en el canvas
+					// Comienzo dibujando un rectángulo
+					// Para ello se dispone de 'fillRect', con cuatro parámetros: columna, fila, anchura, altura
+					// Estos valores se miden en pixeles
+
+					contexto.fillStyle = '#cc0000';
+
+					contexto.fillRect(200, 0, 150, 200);
+				
+					// Cambio el color de estilo de dibujo a rojo, cuyo código en hexadecimal es: #cc0000
+					contexto.fillStyle = 'black';
+
+					// Dibujo otro rectángulo
+					contexto.fillRect(10, 10, 10, 70);
+
+					ctx.beginPath();
+                    ctx.arc(95,50,40,0,2*Math.PI);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(95,50,40,0,2*Math.PI);
+                    ctx.stroke();
+
+
+
+
+				}
+			}
+		}
+
+	</script>
+	<!-- Final de la codificación del programa -->
+
+<!-- Final de la cabecera -->
+</head>
+
+<body>
+
+	<!-- Definición del canvas -->
+	<canvas id="micanvas" width="1000" height="300">
+	Este texto se muestra para los navegadores no compatibles con canvas.
+	<br>
+	Por favor, utiliza Firefox, Chrome, Safari u Opera.
+	</canvas>
+
+	<canvas id="myCanvas" width="1000" height="100">
+    <canvas id="my1Canvas" width="1000" height="200">
+
+</body>
+
+</html>
