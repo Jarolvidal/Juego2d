@@ -1,89 +1,184 @@
-<!-- Documento html orientado a presentar un ejemplo utilizando CANVAS -->
-
-<!-- Etiqueta principal en html -->
+<!DOCTYPE html>
 <html>
-
-<!-- Encabezado -->
 <head>
+	<title>Juego 2D</title>
+	<style type="text/css">
+		canvas { 
+			background: #000000;
+			margin-top: 50px;
+			border-radius: 5px;
+		 }
+	</style>
+</head>
+<body>
+	<center><canvas id="myCanvas" width="500" height="340"></canvas></center>
+	<script type="text/javascript">
+		var canvas = document.getElementById("myCanvas");
+		var ctx = canvas.getContext("2d");
+		var ballRadius = 10;
+		var x = canvas.width/2;
+		var y = canvas.height-30;
+		var dx = 2;
+		var dy = -2;
+		var paddleHeight = 10;
+		var paddleWidth = 75;
+		var paddleX = (canvas.width-paddleWidth)/2;
+		var rightPressed = false;
+		var leftPressed = false;
+		var brickRowCount = 5;
+		var brickColumnCount = 3;
+		var brickWidth = 75;
+		var brickHeight = 20;
+		var brickPadding = 10;
+		var brickOffsetTop = 30;
+		var brickOffsetLeft = 30;
+		var score = 0;
+		var lives = 3;
 
-	<!-- Título que aparece en la barra del navegador -->
-	<title>Probando canvas</title>
-
-	<!-- Inicio de codificación del programa -->
-	<script>
-
-		// Esta función se ejecuta cuando se carga la página (onload)
-		window.onload = function() {
-
-			// Recibimos el elemento canvas. Es una referencia dentro de JavaScript del canvas en html
-			var elemento = document.getElementById('micanvas');
-
-			// Comprobación sobre si encontramos el elemento canvas,
-			// y podemos extraer su contexto con getContext(), que indica compatibilidad con canvas
-			// Si ambas condiciones se cumplen (operador && - and), se ingresa dentro de las llaves {}
-
-			if (elemento && elemento.getContext) {
-				// Accedo al contexto de '2d' de este canvas, necesario para dibujar
-				// Con la variable 'contexto' podemos manipular el canvas a voluntad
-				var contexto = elemento.getContext('2d');
-				var c = document.getElementById("myCanvas");
-				var ctx = c.getContext("2d");
-				var c = document.getElementById("my1Canvas");
-				var ctx = c.getContext("2d");
-			
-			
-				// Si la variable 'contexto' existe, significa que la asignación tuvo éxito,
-				// y se puede utilizar dicha variable para dibujar (o todo lo que corresponda)
-
-				if (contexto) {
-
-					// Si tengo el contexto 2d es que todo ha ido bien y puedo empezar a dibujar en el canvas
-					// Comienzo dibujando un rectángulo
-					// Para ello se dispone de 'fillRect', con cuatro parámetros: columna, fila, anchura, altura
-					// Estos valores se miden en pixeles
-
-					contexto.fillStyle = '#cc0000';
-
-					contexto.fillRect(200, 0, 150, 200);
-				
-					// Cambio el color de estilo de dibujo a rojo, cuyo código en hexadecimal es: #cc0000
-					contexto.fillStyle = 'black';
-
-					// Dibujo otro rectángulo
-					contexto.fillRect(10, 10, 10, 70);
-
-					ctx.beginPath();
-                    ctx.arc(95,50,40,0,2*Math.PI);
-                    ctx.stroke();
-                    ctx.beginPath();
-                    ctx.arc(95,50,40,0,2*Math.PI);
-                    ctx.stroke();
-
-
-
-
-				}
-			}
+		var bricks = [];
+		for(c=0; c<brickColumnCount; c++) {
+		    bricks[c] = [];
+		    for(r=0; r<brickRowCount; r++) {
+		        bricks[c][r] = { x: 0, y: 0, status: 1 };
+		    }
 		}
 
+		document.addEventListener("keydown", keyDownHandler, false);
+		document.addEventListener("keyup", keyUpHandler, false);
+		document.addEventListener("mousemove", mouseMoveHandler, false);
+
+		function keyDownHandler(e) {
+		    if(e.keyCode == 39) {
+		        rightPressed = true;
+		    }
+		    else if(e.keyCode == 37) {
+		        leftPressed = true;
+		    }
+		}
+		function keyUpHandler(e) {
+		    if(e.keyCode == 39) {
+		        rightPressed = false;
+		    }
+		    else if(e.keyCode == 37) {
+		        leftPressed = false;
+		    }
+		}
+		function mouseMoveHandler(e) {
+		    var relativeX = e.clientX - canvas.offsetLeft;
+		    if(relativeX > 0 && relativeX < canvas.width) {
+		        paddleX = relativeX - paddleWidth/2;
+		    }
+		}
+		function collisionDetection() {
+		    for(c=0; c<brickColumnCount; c++) {
+		        for(r=0; r<brickRowCount; r++) {
+		            var b = bricks[c][r];
+		            if(b.status == 1) {
+		                if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
+		                    dy = -dy;
+		                    b.status = 0;
+		                    score++;
+		                    if(score == brickRowCount*brickColumnCount) {
+		                        alert("GANASTE, GRACIAS POR JUGAR!");
+		                        document.location.reload();
+		                    }
+		                }
+		            }
+		        }
+		    }
+		}
+
+		function drawBall() {
+		    ctx.beginPath();
+		    ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+		    ctx.fillStyle = "#00FFFF";
+		    ctx.fill();
+		    ctx.closePath();
+		}
+		function drawPaddle() {
+		    ctx.beginPath();
+		    ctx.rect(paddleX, canvas.height-paddleHeight, paddleWidth, paddleHeight);
+		    ctx.fillStyle = "#E1F30C";
+		    ctx.fill();
+		    ctx.closePath();
+		}
+		function drawBricks() {
+		    for(c=0; c<brickColumnCount; c++) {
+		        for(r=0; r<brickRowCount; r++) {
+		            if(bricks[c][r].status == 1) {
+		                var brickX = (r*(brickWidth+brickPadding))+brickOffsetLeft;
+		                var brickY = (c*(brickHeight+brickPadding))+brickOffsetTop;
+		                bricks[c][r].x = brickX;
+		                bricks[c][r].y = brickY;
+		                ctx.beginPath();
+		                ctx.rect(brickX, brickY, brickWidth, brickHeight);
+		                ctx.fillStyle = "#0095DD";
+		                ctx.fill();
+		                ctx.closePath();
+		            }
+		        }
+		    }
+		}
+		function drawScore() {
+		    ctx.font = "16px Arial";
+		    ctx.fillStyle = "#0095DD";
+		    ctx.fillText("PUNTAJE: "+score, 8, 20);
+		}
+		function drawLives() {
+		    ctx.font = "16px Arial";
+		    ctx.fillStyle = "#0095DD";
+		    ctx.fillText("VIDAS: "+lives, canvas.width-65, 20);
+		}
+
+		function draw() {
+		    ctx.clearRect(0, 0, canvas.width, canvas.height);
+		    drawBricks();
+		    drawBall();
+		    drawPaddle();
+		    drawScore();
+		    drawLives();
+		    collisionDetection();
+		    
+		    if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
+		        dx = -dx;
+		    }
+		    if(y + dy < ballRadius) {
+		        dy = -dy;
+		    }
+		    else if(y + dy > canvas.height-ballRadius) {
+		        if(x > paddleX && x < paddleX + paddleWidth) {
+		            dy = -dy;
+		        }
+		        else {
+		            lives--;
+		            if(!lives) {
+		                alert("PERDISTE");
+		                document.location.reload();
+		            }
+		            else {
+		                x = canvas.width/2;
+		                y = canvas.height-30;
+		                dx = 3;
+		                dy = -3;
+		                paddleX = (canvas.width-paddleWidth)/2;
+		            }
+		        }
+		    }
+		    
+		    if(rightPressed && paddleX < canvas.width-paddleWidth) {
+		        paddleX += 7;
+		    }
+		    else if(leftPressed && paddleX > 0) {
+		        paddleX -= 7;
+		    }
+		    
+		    x += dx;
+		    y += dy;
+		    requestAnimationFrame(draw);
+		}
+
+		draw();
 	</script>
-	<!-- Final de la codificación del programa -->
-
-<!-- Final de la cabecera -->
-</head>
-
-<body>
-
-	<!-- Definición del canvas -->
-	<canvas id="micanvas" width="1000" height="300">
-	Este texto se muestra para los navegadores no compatibles con canvas.
-	<br>
-	Por favor, utiliza Firefox, Chrome, Safari u Opera.
-	</canvas>
-
-	<canvas id="myCanvas" width="1000" height="100">
-    <canvas id="my1Canvas" width="1000" height="200">
 
 </body>
-
 </html>
